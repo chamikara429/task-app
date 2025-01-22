@@ -1,0 +1,6 @@
+
+# Keep environment variables out of version control
+notes-app-server/.env
+notes-app-server/node_modules
+notes-app-ui/node_modules
+
