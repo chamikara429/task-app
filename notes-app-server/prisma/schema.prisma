@@ -18,5 +18,6 @@ model Note {
   id      Int    @id @default(autoincrement())
   title   String
   content String
+  time    Int  @default(0)
   deleted Boolean @default(false)
 }

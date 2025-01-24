@@ -6,6 +6,7 @@ type Note = {
   title: string;
   content: string;
   deleted: boolean;
+  time: number;
 }
 
 function App() {
@@ -14,8 +15,10 @@ function App() {
   const [notes, setNotes] = useState < Note[] >([]);
   const [title, setTitle] = useState < string >('');
   const [content, setContent] = useState < string >('');
+  const [time, setTime] = useState < number >(0);
   const [deleted, setDeleted] = useState < boolean > (false);
   const [selectedNote, setSelectedNote] = useState < Note | null > (null);
+  const timeOptons = [5,10,15,20,25,30,40,50,60];
 
   // use useEffect hook to sync components with api
   useEffect(()=> {
@@ -36,6 +39,7 @@ function App() {
     setSelectedNote(note);
     setTitle(note.title);
     setContent(note.content);
+    setTime(note.time);
     setDeleted(note.deleted);
   }
 
@@ -60,6 +64,7 @@ function App() {
           body: JSON.stringify({
             title,
             content,
+            time,
             deleted
           })
         }
@@ -73,6 +78,7 @@ function App() {
       setNotes(updatedNotesList);
       setTitle('');
       setContent('');
+      setTime(0);
       setSelectedNote(null);
       setDeleted(false);
 
@@ -87,6 +93,7 @@ function App() {
     setSelectedNote(null);
     setTitle('');
     setContent('');
+    setTime(0);
     setDeleted(false);
   }
 
@@ -107,6 +114,7 @@ function App() {
           body: JSON.stringify({
             title,
             content,
+            time,
             deleted:true
           })
         }
@@ -134,6 +142,7 @@ function App() {
           body: JSON.stringify({
             title,
             content,
+            time,
             deleted
           }),
         }
@@ -142,6 +151,7 @@ function App() {
       setNotes([newNote, ...notes]);
       setTitle('');
       setContent('');
+      setTime(0);
       setDeleted(false);
     } catch(e){
         console.log(e)
@@ -175,6 +185,18 @@ function App() {
         rows={10}
       ></textarea>
 
+      <select
+        value={time}
+        onChange={(e)=> setTime(parseInt(e.target.value))}
+      >
+        <option value="0">Est. Time</option>
+        {
+        timeOptons.map((timeItem) => (
+            <option value={timeItem}>{timeItem}</option>
+        ))
+        }
+      </select> 
+
       {selectedNote ? (
         <div className='edit-buttons'>
           <button type='submit'>Save</button>
@@ -197,6 +219,10 @@ function App() {
             </div>
             <h2>{note.title}</h2>
             <p>{note.content}</p>
+            {
+            parseInt(note.time) > 0 ?
+              <p>Est. Time: {note.time}</p> : ''
+            }
           </div>
         ))}
       </div>
