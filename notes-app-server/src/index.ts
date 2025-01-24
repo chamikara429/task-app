@@ -16,7 +16,11 @@ app.use(cors(
 ));
 
 app.get("/api/notes", async (req, res) => {
-    const notes = await prisma.note.findMany();
+    const notes = await prisma.note.findMany({
+        where: {
+            deleted: false
+        }
+    });
     res.json(notes);
 });
 
@@ -33,7 +37,8 @@ app.post("/api/notes", async (req, res) => {
         const note = await prisma.note.create({
             data: {
                 title,
-                content
+                content,
+                deleted:false
             }
         });
         res.json(note);
@@ -51,8 +56,6 @@ app.put("/api/notes/:id", async (req, res) => {
     // if(!id || isNaN(id)){
     //     return res.status(400).send("ID must be a valid number")
     // }
-
-
     if (!title || !content) {
         // return res.status(400)
     //     .send('Title and content are required')
@@ -71,24 +74,39 @@ app.put("/api/notes/:id", async (req, res) => {
 });
 
 
-app.delete("/api/notes/:id", async (req,res) => {
-    const id = parseInt(req.params.id);
+// app.delete("/api/notes/:id", async (req,res) => {
+//     const id = parseInt(req.params.id);
 
-    // if(!id || isNaN(id)){
-    //     return res.status(400).send("ID must be a valid number")
-    // }
+//     // if(!id || isNaN(id)){
+//     //     return res.status(400).send("ID must be a valid number")
+//     // }
 
-    try{
-        const deleteNote = await prisma.note.delete({
-            where: {id}
-        });
-        //res.status(204).send();
+//     try{
+//         const deleteNote = await prisma.note.delete({
+//             where: {id}
+//         });
+//         //res.status(204).send();
      
-        res.json(deleteNote)
-    } catch(error){
+//         res.json(deleteNote)
+//     } catch(error){
+//         res.status(500).send("Oops, something went wrong");
+//     }
+
+// });
+
+app.put("/api/notes/delete/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const updateDeletedNote = await prisma.note.update({
+            where: { id },
+            data: {
+                deleted: true
+            }
+        });
+        res.json(updateDeletedNote);
+    } catch (error) {
         res.status(500).send("Oops, something went wrong");
     }
-
 });
 
 

@@ -5,6 +5,7 @@ type Note = {
   id: number;
   title: string;
   content: string;
+  deleted: boolean;
 }
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [notes, setNotes] = useState < Note[] >([]);
   const [title, setTitle] = useState < string >('');
   const [content, setContent] = useState < string >('');
+  const [deleted, setDeleted] = useState < boolean > (false);
   const [selectedNote, setSelectedNote] = useState < Note | null > (null);
 
   // use useEffect hook to sync components with api
@@ -34,6 +36,7 @@ function App() {
     setSelectedNote(note);
     setTitle(note.title);
     setContent(note.content);
+    setDeleted(note.deleted);
   }
 
   //UpdateNote
@@ -56,7 +59,8 @@ function App() {
           },
           body: JSON.stringify({
             title,
-            content
+            content,
+            deleted
           })
         }
       )
@@ -70,6 +74,7 @@ function App() {
       setTitle('');
       setContent('');
       setSelectedNote(null);
+      setDeleted(false);
 
 
     } catch(e){
@@ -82,25 +87,33 @@ function App() {
     setSelectedNote(null);
     setTitle('');
     setContent('');
+    setDeleted(false);
   }
 
   //DeleteNote
   // use useEffect hook to sync components with api
   const deleteNote = async (e: React.MouseEvent, noteId: number) => {
+
     e.stopPropagation();
 
     try{
       const response = await fetch(
-        `http://localhost:5001/api/notes/${noteId}`,
+        `http://localhost:5001/api/notes/delete/${noteId}`,
         {
-          method: "DELETE",
+          method: "PUT", //method: "DELETED",
           headers: {
             "Content-Type" : "application/json"
-          }
+          },
+          body: JSON.stringify({
+            title,
+            content,
+            deleted:true
+          })
         }
       );
       const updatedNotes = notes.filter((note) => note.id !== noteId);
       setNotes(updatedNotes);
+      setDeleted(true);
     } catch(e){
       console.log(e)
     }
@@ -120,7 +133,8 @@ function App() {
           },
           body: JSON.stringify({
             title,
-            content
+            content,
+            deleted
           }),
         }
       );
@@ -128,6 +142,7 @@ function App() {
       setNotes([newNote, ...notes]);
       setTitle('');
       setContent('');
+      setDeleted(false);
     } catch(e){
         console.log(e)
     }
@@ -159,6 +174,7 @@ function App() {
         required
         rows={10}
       ></textarea>
+
       {selectedNote ? (
         <div className='edit-buttons'>
           <button type='submit'>Save</button>
